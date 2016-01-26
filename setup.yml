@@ -1,0 +1,22 @@
+---
+
+# file: setup.yml
+
+- name: 'PostgreSQL role'
+  hosts: database
+  sudo: yes
+  roles:
+    - postgresql
+
+- name: 'Zabbix server role'
+  hosts: monitoring
+  sudo: yes
+  roles:
+    - zabbix_server
+
+- name: 'Zabbix agent role'
+  hosts: all
+  sudo: yes
+  roles:
+    - zabbix_agent
+

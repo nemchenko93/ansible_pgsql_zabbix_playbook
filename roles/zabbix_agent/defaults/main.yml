@@ -1,0 +1,15 @@
+---
+
+# file: roles/zabbix_agent/defaults/main.yml
+
+zabbix_agent_config_server: "{{ zabbix_server_ip }}"
+zabbix_agent_config_server_active: "{{ zabbix_server_ip }}":10051
+zabbix_agent_config_hostname: "{{ ansible_fqdn }}"
+zabbix_agent_enable_remote_commands: 1
+zabbix_agent_unsafe_user_parameters: 1
+zabbix_agent_log_remote_commands: 1
+zabbix_agent_config_include: /etc/zabbix/zabbix_agentd.d/
+zabbix_agent_config_include_confs: 'postgresql.cfg'
+zabbix_agent_pkg_state: installed
+zabbix_agent_service_state: started
+zabbix_agent_service_enabled: yes

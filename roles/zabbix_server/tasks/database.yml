@@ -1,0 +1,33 @@
+---
+
+# role/zabbix_server/tasks/database.yml
+
+- name: Configure .pgpass
+  template:
+    src: pgpass.j2
+    dest: "/home/{{ postgresql_admin_user }}/.pgpass"
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+    mode: 0600
+
+#- name: Import schema file
+#  command: "/usr/pgsql-{{ postgresql_version }}/bin/psql -h {{ postgresql_host }} -U {{ postgresql_dbuser }} -d {{ postgresql_database }} -f /usr/share/doc/zabbix-server-{{ database_type }}-{{ zabbix_minor_version }}/create/schema.sql"
+#  when: zabbix_database_sqlload
+
+#- name: Import images file
+#  command: "/usr/pgsql-{{ postgresql_version }}/bin/psql -h {{ postgresql_host }} -U {{ postgresql_dbuser }} -d {{ postgresql_database }} -f /usr/share/doc/zabbix-server-{{ database_type }}-{{ zabbix_minor_version }}/create/images.sql"
+#  when: zabbix_database_sqlload
+
+#- name: Import data file
+#  command: "/usr/pgsql-{{ postgresql_version }}/bin/psql -h {{ postgresql_host }} -U {{ postgresql_dbuser }} -d {{ postgresql_database }} -f /usr/share/doc/zabbix-server-{{ database_type }}-{{ zabbix_minor_version }}/create/data.sql"
+#  when: zabbix_database_sqlload
+
+- name: Import schema, images, data files into database
+  sudo: yes
+  sudo_user: "{{ postgresql_admin_user }}"
+  command: "/usr/pgsql-{{ postgresql_version }}/bin/psql -h {{ postgresql_host }} -U {{ postgresql_dbuser }} -d {{ postgresql_database }} -f /usr/share/doc/zabbix-server-{{ database_type }}-{{ zabbix_minor_version }}/create/{{ item }}"
+  with_items:
+    - schema.sql
+    - images.sql
+    - data.sql
+  when: zabbix_database_sqlload

@@ -1,0 +1,14 @@
+---
+
+# file: roles/postgresql/handlers/main.yml
+
+- name: restart postgresql service
+  service: 
+    state: restarted
+    name: "postgresql-{{ postgresql_version }}" 
+
+- name: reload postgresql service
+  service: 
+    state: reloaded
+    name: "postgresql-{{ postgresql_version }}" 
+

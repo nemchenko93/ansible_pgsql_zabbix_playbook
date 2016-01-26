@@ -1,0 +1,17 @@
+<?php
+global $DB;
+
+$DB['TYPE']     = '{{ database_type_long|upper() }}';
+$DB['SERVER']   = '{{ postgresql_host }}';
+$DB['PORT']     = '0';
+$DB['DATABASE'] = '{{ postgresql_database }}';
+$DB['USER']     = '{{ postgresql_dbuser }}';
+$DB['PASSWORD'] = '{{ postgresql_dbpassword }}';
+
+$DB['SCHEMA'] = '';
+$ZBX_SERVER      = '{{ inventory_hostname }}';
+$ZBX_SERVER_PORT = '{{ server_listenport }}';
+$ZBX_SERVER_NAME = '{{ inventory_hostname_short }}';
+
+$IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;
+?>

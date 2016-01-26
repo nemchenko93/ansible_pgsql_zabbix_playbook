@@ -1,0 +1,22 @@
+---
+
+# file: roles/postgresql/tasks/install.yml
+
+- name: Install postgresql repository package
+  yum: 
+    state: present
+    name: "{{ postgresql_repo_package }}" 
+
+- name: Install zabbix repository package
+  yum:
+    state: present
+    name: "{{ zabbix_repo_package }}"
+
+- name: Install postgresql server packages
+  yum: 
+    state: latest
+    name: "{{ item }}"
+  with_items:
+    - postgresql{{ postgresql_version |replace('.', '') }}-server
+    - postgresql{{ postgresql_version |replace('.', '') }}-contrib
+    - python-psycopg2

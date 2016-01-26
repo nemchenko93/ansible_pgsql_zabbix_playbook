@@ -1,0 +1,11 @@
+---
+
+# file: roles/postgresql/tasks/users.yml
+
+- name: "Add postgresql roles"
+  postgresql_user:
+    state: present
+    name: "{{ postgresql_dbuser }}"
+    encrypted: no
+    password: "{{ postgresql_dbpassword }}"
+    role_attr_flags: "{{ postgresql_dbuser_permissions }}"

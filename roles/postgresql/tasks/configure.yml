@@ -1,0 +1,69 @@
+---
+
+# file: roles/postgresql/tasks/configure.yml
+
+- name: Stop old postgresql service
+  service: name="postgresql-{{ postgresql_version }}" state=stopped
+  when: postgresql_drop_old_cluster
+  ignore_errors: True
+
+- name: Remove old postgresql cluster
+  command: "rm -rf /var/lib/pgsql/{{ postgresql_version }}/data {{ postgresql_cluster_location }}"
+  when: postgresql_drop_old_cluster
+
+- name: Create custom postgresql cluster directory
+  file:
+    path: "{{ postgresql_cluster_location }}"
+    state: directory
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+    mode: 0700
+  when: postgresql_cluster_location|length > 0
+
+- name: Replace default postgresql cluster directory with symlink
+  file:
+    src: "{{ postgresql_cluster_location }}"
+    dest: "/var/lib/pgsql/{{ postgresql_version }}/data"
+    state: link
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+  when: postgresql_cluster_location|length > 0
+
+- name: Configure .pgpass
+  template:
+    src: pgpass.j2
+    dest: "/home/{{ postgresql_admin_user }}/.pgpass"
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+    mode: 0600
+
+- name: Initialize postgresql cluster
+  sudo: yes
+  sudo_user: "{{ postgresql_admin_user }}"
+  command: "/usr/pgsql-{{ postgresql_version }}/bin/initdb --data-checksums --pgdata=/var/lib/pgsql/{{ postgresql_version }}/data"
+
+- name: Configure pg_hba.conf
+  template:
+    src: pg_hba.conf.j2
+    dest: "/var/lib/pgsql/{{ postgresql_version }}/data/pg_hba.conf"
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+    mode: 0640
+  notify:
+    - reload postgresql service
+
+- name: Configure postgresql.conf
+  template:
+    src: postgresql.conf.j2
+    dest: "/var/lib/pgsql/{{ postgresql_version }}/data/postgresql.conf"
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+    mode: 0640
+  notify:
+    - restart postgresql service
+
+- name: Start postgresql service
+  service: 
+    name: "postgresql-{{ postgresql_version }}"
+    state: started
+    enabled: true

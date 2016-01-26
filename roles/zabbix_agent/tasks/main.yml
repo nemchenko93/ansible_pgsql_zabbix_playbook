@@ -1,0 +1,36 @@
+---
+
+# file: roles/zabbix_agent/tasks/main.yml
+
+- name: install zabbix agent
+  yum: 
+    state: latest
+    name: zabbix-agent 
+
+- name: configure zabbix agent
+  template: 
+    src: zabbix_agentd.conf.j2 
+    dest: /etc/zabbix/zabbix_agentd.conf
+  notify: restart zabbix-agent
+
+- name: create zabbix agent optional config directory
+  file: 
+    path: "{{ zabbix_agent_config_include }}"
+    state: directory
+
+- name: copy additional configs
+  sudo: yes
+  copy:
+    src: "{{ item }}"
+    dest: "{{ zabbix_agent_config_include }}"
+    owner: zabbix
+    group: users
+    mode: 0644
+  with_items: zabbix_agent_config_include_confs
+  notify: restart zabbix-agent
+
+- name: ensure zabbix agent started
+  service: 
+    state: started
+    name: zabbix-agent
+    enabled: yes

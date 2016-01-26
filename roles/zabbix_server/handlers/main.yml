@@ -1,0 +1,16 @@
+---
+
+# file: role/zabbix_server/handlers/main.yml
+
+- name: restart zabbix-server
+  service: 
+    state: restarted
+    name: zabbix-server 
+    enabled: yes
+ 
+- name: restart apache
+  service: 
+    state: restarted
+    name: httpd 
+    enabled: yes
+ 

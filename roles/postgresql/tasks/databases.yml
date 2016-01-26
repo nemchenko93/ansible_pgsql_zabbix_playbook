@@ -1,0 +1,20 @@
+---
+
+# file: roles/postgresql/tasks/databases.yml
+
+- name: "Add databases"
+  postgresql_db:
+    state: present
+    name: "{{ postgresql_database }}"
+    template: "{{ postgresql_dbtemplate }}"
+    encoding: "{{ postgresql_dbencoding }}"
+    lc_collate: "{{ postgresql_dbcollate }}"
+    lc_ctype: "{{ postgresql_dbctype }}"
+    owner: "{{ postgresql_dbowner }}"
+
+- name: "Add extensions"
+  sudo: yes
+  sudo_user: "{{ postgresql_admin_user }}"
+  command: "/usr/pgsql-{{ postgresql_version }}/bin/psql {{ postgresql_database }} -c 'CREATE EXTENSION IF NOT EXISTS {{ item }}'"
+  with_items: postgresql_extensions
+  when: postgresql_contrib
